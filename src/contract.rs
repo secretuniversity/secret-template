@@ -44,7 +44,7 @@ pub fn try_increment(
     deps: DepsMut,
 ) -> Result<Response, ContractError> {
 
-    config(deps.storage).update(|mut state: State| -> Result<State, ContractError> {
+    config(deps.storage).update(|mut state| -> Result<_, ContractError> {
         state.count += 1;
         Ok(state)
     })?;
@@ -59,7 +59,7 @@ pub fn try_reset(
     count: i32,
 ) -> Result<Response, ContractError> {
 
-    config(deps.storage).update(|mut state: State| -> Result<State, ContractError> {
+    config(deps.storage).update(|mut state| -> Result<_, ContractError> {
         if info.sender != state.owner {
             return Err(ContractError::Unauthorized {});
         }
