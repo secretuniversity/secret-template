@@ -64,7 +64,7 @@ const initializeContract = async (
       codeId,
       initMsg: { count: 4 }, // Initialize our counter to start from 4. This message will trigger our Init function
       codeHash: contractCodeHash,
-      label: "My contract" + Math.ceil(Math.random() * 10000), // The label should be unique for every contract, add random string in order to maintain uniqueness
+      label: "secret-counter-" + Math.ceil(Math.random() * 10000), // The label should be unique for every contract, add random string in order to maintain uniqueness
     },
     {
       gasLimit: 1000000,
