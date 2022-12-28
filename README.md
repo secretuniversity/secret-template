@@ -1,7 +1,7 @@
 # Secret Contracts Starter Pack
 
 This is a template to build secret contracts in Rust to run in
-[Secret Network](https://github.com/enigmampc/SecretNetwork).
+[Secret Network](https://github.com/scrtlabs/SecretNetwork).
 To understand the framework better, please read the overview in the
 [cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
 and dig into the [cosmwasm docs](https://www.cosmwasm.com).
@@ -24,7 +24,7 @@ Now, use it to create your new contract.
 Go to the folder in which you want to place it and run:
 
 ```sh
-cargo generate --git https://github.com/secretuniversity/secret-template.git --name YOUR_NAME_HERE
+cargo generate --git https://github.com/secretuniversity/secret-template-cw1.git --name YOUR_NAME_HERE
 ```
 
 You will now have a new folder called `YOUR_NAME_HERE` (I hope you changed that to something else)
