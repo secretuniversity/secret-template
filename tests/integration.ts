@@ -7,9 +7,11 @@ import assert from "assert";
 const initializeClient = async (endpoint: string, chainId: string) => {
   const wallet = new Wallet(); // Use default constructor of wallet to generate random mnemonic.
   const accAddress = wallet.address;
-  const client = await SecretNetworkClient.create({
-    // Create a client to interact with the network
-    grpcWebUrl: endpoint,
+
+  // To create a signer secret.js client, also pass in a wallet
+  const client = await new SecretNetworkClient({
+    //url: "http://localhost:1317",
+    url: endpoint,
     chainId: chainId,
     wallet: wallet,
     walletAddress: accAddress,
@@ -29,7 +31,7 @@ const initializeContract = async (
 
   const uploadReceipt = await client.tx.compute.storeCode(
     {
-      wasmByteCode: wasmCode,
+      wasm_byte_code: wasmCode,
       sender: client.address,
       source: "",
       builder: "",
@@ -52,18 +54,20 @@ const initializeContract = async (
     }
   );
 
-  const codeId = Number(codeIdKv!.value);
-  console.log("Contract codeId: ", codeId);
+  const code_id = Number(codeIdKv!.value);
+  console.log("Contract codeId: ", code_id);
 
-  const contractCodeHash = await client.query.compute.codeHash(codeId);
-  console.log(`Contract hash: ${contractCodeHash}`);
+  const { code_hash } = await client.query.compute.codeHashByCodeId({
+    code_id: String(code_id),
+  });
+  console.log(`Contract hash: ${code_hash}`);
 
   const contract = await client.tx.compute.instantiateContract(
     {
       sender: client.address,
-      codeId,
-      initMsg: { count: 4 }, // Initialize our counter to start from 4. This message will trigger our Init function
-      codeHash: contractCodeHash,
+      code_id,
+      code_hash,
+      init_msg: { count: 4 }, // Initialize our counter to start from 4. This message will trigger our Init function
       label: "secret-counter-" + Math.ceil(Math.random() * 10000), // The label should be unique for every contract, add random string in order to maintain uniqueness
     },
     {
@@ -77,13 +81,13 @@ const initializeContract = async (
     );
   }
 
-  const contractAddress = contract.arrayLog!.find(
+  const contract_address = contract.arrayLog!.find(
     (log) => log.type === "message" && log.key === "contract_address"
   )!.value;
 
-  console.log(`Contract address: ${contractAddress}`);
+  console.log(`Contract address: ${contract_address}`);
 
-  var contractInfo: [string, string] = [contractCodeHash, contractAddress];
+  var contractInfo: [string, string] = [code_hash!, contract_address!];
   return contractInfo;
 };
 
@@ -94,11 +98,12 @@ const getFromFaucet = async (address: string) => {
 };
 
 async function getScrtBalance(userCli: SecretNetworkClient): Promise<string> {
-  let balanceResponse = await userCli.query.bank.balance({
+  const response = await userCli.query.bank.balance({
     address: userCli.address,
     denom: "uscrt",
   });
-  return balanceResponse.balance!.amount;
+
+  return response.balance!.amount!;
 }
 
 async function fillUpFromFaucet(
@@ -119,7 +124,7 @@ async function fillUpFromFaucet(
 
 // Initialization procedure
 async function initializeAndUploadContract() {
-  let endpoint = "http://localhost:9091";
+  let endpoint = "http://localhost:1317";
   let chainId = "secretdev-1";
 
   const client = await initializeClient(endpoint, chainId);
@@ -147,8 +152,8 @@ async function queryCount(
   type CountResponse = { count: number };
 
   const countResponse = (await client.query.compute.queryContract({
-    contractAddress: contractAddress,
-    codeHash: contractHash,
+    contract_address: contractAddress,
+    code_hash: contractHash,
     query: { get_count: {} },
   })) as CountResponse;
 
@@ -169,12 +174,12 @@ async function incrementTx(
   const tx = await client.tx.compute.executeContract(
     {
       sender: client.address,
-      contractAddress: contractAddess,
-      codeHash: contractHash,
+      contract_address: contractAddess,
+      code_hash: contractHash,
       msg: {
         increment: {},
       },
-      sentFunds: [],
+      sent_funds: [],
     },
     {
       gasLimit: 200000,
@@ -193,12 +198,12 @@ async function resetTx(
   const tx = await client.tx.compute.executeContract(
     {
       sender: client.address,
-      contractAddress: contractAddess,
-      codeHash: contractHash,
+      contract_address: contractAddess,
+      code_hash: contractHash,
       msg: {
         reser: { count: 0 },
       },
-      sentFunds: [],
+      sent_funds: [],
     },
     {
       gasLimit: 200000,
