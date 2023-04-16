@@ -1,5 +1,5 @@
 [package]
-name = "secret-template-cw1"
+name = "secret-template"
 version = "0.1.0"
 authors = ["laura <laura@secretchaingirl.io>"]
 edition = "2021"
